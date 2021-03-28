@@ -13,8 +13,8 @@ object MinTemperatures {
       val fields = line.split(",")
       val stationId = fields(0)
       val entryType = fields(2)
-      val temperatory = fields(3).toFloat * .1f * (9f / 5f) + 32f
-      (stationId, entryType, temperatory)
+      val temperature = fields(3).toFloat * .1f * (9f / 5f) + 32f
+      (stationId, entryType, temperature)
     }
 
     Logger.getLogger("org").setLevel(Level.ERROR)

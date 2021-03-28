@@ -16,10 +16,10 @@ First, for a little bit of reintroduction to Scala, the /scala_basic folder has 
 
 | Lesson | Source |  Note |
 |--|--|--|
-| [Lesson 6](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363784#overview) | [scala-1](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala1-1.sc) | Scala `Primitives` |
-| [Lesson 7](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363790#overview) | [scala-2](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala2-1.sc) | `Conditions` and `Loops` |
-| [Lesson 8](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363796#overview) | [scala-3](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala3-1.sc) | Introduction for `functions`, creating, passing, ... |
-| [Lesson 9](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363798#overview) | [scala-4](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala4-1.sc) | Data Structures: mainly `List` and `Map` and predefined function of them |
+| [Video 6](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363784#overview) | [scala-1](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala1-1.sc) | Scala `Primitives` |
+| [Video 7](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363790#overview) | [scala-2](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala2-1.sc) | `Conditions` and `Loops` |
+| [Video 8](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363796#overview) | [scala-3](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala3-1.sc) | Introduction for `functions`, creating, passing, ... |
+| [Video 9](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5363798#overview) | [scala-4](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/scala_basic/LearningScala4-1.sc) | Data Structures: mainly `List` and `Map` and predefined function of them |
 
 ---
 ## Section 3: Using Resilient Distributed Datasets (RDDs)

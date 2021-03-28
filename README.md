@@ -40,6 +40,7 @@ Introduction to RDD: [Lesson 10](https://www.udemy.com/course/apache-spark-with-
 ---
 ## Section 4: SparkSQL, DataFrames, and DataSets
 Then an introduction to `DataSet`/`DataFrames`: [Video 23](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5582410)
+More information on DataSets [apache](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/Dataset.html)
 
 
 | Video | Source | Note |
@@ -52,3 +53,15 @@ Then an introduction to `DataSet`/`DataFrames`: [Video 23](https://www.udemy.com
 | [Video 30](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22022652) | [TotalSpendByCustomer](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/TotalSpendByCustomerDataset.scala) | Read dataset, `groupBy("customer")` then either `.agg(round(sum($"cost").alias("total_spent"))` or `.sum("cost").withColumn("total_spent", round($"sum(cost)", 2))` ; then `select("customer", "total_spent").orderBy("total_spent")` and print. Both the .agg(round) and .sum("cost") have the same results. At the moment, I don't know whether there is a substantial difference, either in flexibility or speed. |
 
 ## 5: Advanced Examples of Spark Programs
+Introduction 
+
+Source root: [advanced](https://github.com/dhohle/SparkScalaCourse/tree/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced)
+
+|  |  |  |
+|--|--|--|
+| [Video 32](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364972) | [MovieRatingDataset](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/A1_MovieRatingDataset.scala) | 1) Find the 10 most 'watched' movies (according to this dataset). Load data as usual. However, since we only need the `movieID`, the `case class schema` only has `movieID`, the other columns will be disregarded. After loading the data in a `DataSet`, we `groupBy("movieID").count().orderBy(desc("count"))` and print the first 10 like `show(10)`. Note the `count` where we sort on, is a column created by counting the movies, by calling `.count()`. By default, Spark presumed a `comma-separated file`, since this file is a tab separated file, we need to tell Spark to load it in with `\t` before the `csv` file is loaded, using `.option("sep", "\t")` |
+| [Video 33](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364974) | [PopularMoviesBroadcast](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/A2_PopularMoviesDatasetBroadcast.scala) | Combine the previous result, with another input - loaded using Scala - and sent to the cluster as a `Broadcast variable`. Broadcast the loaded Map using `val nameDict = spark.sparkContext.broadcast(loadMovieNames())`. This changes the `Map[Int,String]` type to `Broadcast[Map[Int, String]]`. Now the Map - from `loadMovieNames` are broadcasted to all computers in the cluster. Load the movie data, like in `MovieRatingDataset`. Now, create an anonymous function to map an `Int` (movieID) to a `String` (movieName) by using `nameDict` (the broadcasted dictionary) and get the value (String) for the key (Int) - per row. Function like `val lookupName: Int => String = (movieID:Int) => nameDict.value(movieID)`. This function needs to be wrapped up as an `udf` (User Defined Function) by `val lookupNameUDF = udf(functionName)`. Finally, map the movieID to the name by creating a new column and apply the `udf` to the value of column `movieID`, like: `movieCounts.withColumn("movieTitle", lookupNameUDF(col("movieID)))`. The sort and print |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+

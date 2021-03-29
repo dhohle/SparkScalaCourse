@@ -63,8 +63,60 @@ Source root: [advanced](https://github.com/dhohle/SparkScalaCourse/tree/master/s
 | [Video 33](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364974) | [PopularMoviesBroadcast](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/A2_PopularMoviesDatasetBroadcast.scala) | Combine the previous result, with another input - loaded using Scala - and sent to the cluster as a `Broadcast variable`. Broadcast the loaded Map using `val nameDict = spark.sparkContext.broadcast(loadMovieNames())`. This changes the `Map[Int,String]` type to `Broadcast[Map[Int, String]]`. Now the Map - from `loadMovieNames` are broadcasted to all computers in the cluster. Load the movie data, like in `MovieRatingDataset`. Now, create an anonymous function to map an `Int` (movieID) to a `String` (movieName) by using `nameDict` (the broadcasted dictionary) and get the value (String) for the key (Int) - per row. Function like `val lookupName: Int => String = (movieID:Int) => nameDict.value(movieID)`. This function needs to be wrapped up as an `udf` (User Defined Function) by `val lookupNameUDF = udf(functionName)`. Finally, map the movieID to the name by creating a new column and apply the `udf` to the value of column `movieID`, like: `movieCounts.withColumn("movieTitle", lookupNameUDF(col("movieID)))`. The sort and print |
 | [Video 34](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364976) | [MostPopularSuperhero](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/B1_MostPopularSuperheroDataset.scala) | Load 2 data files. Not a lot special going on though |
 | [Video 35](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22043502) + [Video 36](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22043518) | [MostObscureSuperheroDataset](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/B2_MostObscureSuperheroDataset.scala) | This starts like the previous, but find the least popular ones. Whereas for the latter we expected only one, for this we expect multiple. So, first, find the minimum number of co-occurrences by `.agg(min("connections")).first().getLong(0)`. Use that number to filter the previous result on `.filter($"connections" === minNumber)`. Then we need to join the `mostObscure` with the `names` dataframes. They both have `id` as identifier, so this will work `mostObscure.join(names, "id")`. Then print and done.  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
+| [Video 37](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364980) + [Video 38](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5591610) + [Video 39](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5591610) | [BFSinRDD](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/rdd/advanced/C1_DegreesOfSeparationBetweenSuperHeroes.scala) + [BFSinDataset](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/C2_DegreesOfSeparationUsingDatasets.scala) | Find the degrees of separation between super-heroes. Using RDD's and Datasets. The dataset version is ~3 times slower, but its implementation has some interesting features, like `withColumn`, `when` and `otherwise` and `join` |
+| [Video 40](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364988) + [Video 41](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364990) | [MovieSimilarities](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/D1_MovieSimilarities.scala) | Item-Based Collaborative Filtering, with `caching` and `self-join` |
+| [Video 41](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5364992) | [MoviesSimilarityUpdate](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/advanced/D1_MovieSimilaritiesUpdate.scala) |  |
 
+
+# Running on a Cluster
+
+## Packaging and Monitoring
+## Using IntelliJ
+[Create a Jar using IntelliJ](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5436234). 
+- File->Project Structure->Artifacts->+->Jar->Empty
+- Select necessary elements and name the jar; check `include in project build`-> OK
+- `Ctrl+F9` to build project -> {root}/out/artifacts/{projectName}/{jarName}
+- For Testing purposes (with local files), navigate to {root} dir
+	- {pathToSparkSubmit} --class {pathToMainClass} {pathToJar}
+	- `Y:\spark-3.1.1\bin\spark-submit.cmd --class com.sundogsoftware.spark.self.cluster.HelloWorld F:\IntelliJ\scala\SparkScalaCourse\out\artifacts\sparkCourse\sparkCourse.jar`
+
+### Packaging with SBT
+[See Video](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5436346)
+
+http://media.sundog-soft.com/SparkScala/sbt.zip
+See: `extra/sbt` for the test run.
+See:  `extra/sbt/build.sbt` here the default Spark packages are set to `provided` because it is assumed those packages are in the production environment. If they are not expected to be found there, leave the `provided` bit out, so those dependencies will be added to the `jar`
+See: `extra/sbt/project/assembly.sbt` which says `addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
+`
+To be sure: start `cmd` with `administrator rights`
+
+Go to the `sbt` folder `{root}/extra/sbt` and type: `sbt assembly`
+Then `cd ` to `target\scala-2.11`; this is where the `jar` is
+[Video 45](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22045942): 
+
+Create a new directory for that project (if multiple main classes are in the current project).
+Create a `build.sbt` file to package one application:
+```
+name := "SparkScalaCourse"
+version := "0.1"
+scalaVersion := "2.12.12"
+libraryDependencies ++= Seq(
+  "org.apache.spark" %% "spark-core" % "3.1.1"  % "provided",
+  "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided"
+)
+```
+-	Create file in `project/assembly.txt` and add 
+	- `addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")`
+- Copy the relevant source files in `src/main/scala/*`
+- In `terminal` run `sbt assembly`
+	- This creates a new directory `target/scala-2.12` with the containing `jar`
+- Since we need a local data file, make sure `data\1800.csv` can be reached from the current `path`
+- Then execute on the cluster using:
+`Y:\spark-3.1.1\bin\spark-submit.cmd  target\scala-2.12\SparkScalaCourse-assembly-0.1.jar`
+[Video 46](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22045960): how teacher did it
+- Be aware of local files
+- If running on cluster, remove (or change) `master("local[*]")`
+- Check Spark version in the `{SparkRoot}/RELEASE`
+- Check compatible Scala version for Spark: [see](https://spark.apache.org/downloads.html)  then check [latest Scala build](https://www.scala-lang.org/download/all.html)
+
+## Amazon Elastic MapReduce

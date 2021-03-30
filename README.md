@@ -119,4 +119,87 @@ libraryDependencies ++= Seq(
 - Check Spark version in the `{SparkRoot}/RELEASE`
 - Check compatible Scala version for Spark: [see](https://spark.apache.org/downloads.html)  then check [latest Scala build](https://www.scala-lang.org/download/all.html)
 
+## Cloud Settings
+-  `--master`
+	- yarn - for running a YARN / Hadoop cluster
+	- hostname:port - for connecting to a master on a Spark standalone cluster
+	- mesos://masternode:port
+	- A master in your SparkConf will override this!
+- `--num-executors`
+	- Must set explicitly with YARN, only 2 by default
+- `--executor-memory`
+	- Make sure you don't try to use more memory than you have
+- `--total-executor-cores`
+
 ## Amazon Elastic MapReduce
+[Video 47](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365002) Introduction to Elastic MapReduce
+[Video 48](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365004) Example in EMR and how to
+
+## Repartitioning
+[Video 49](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365008)
+- Running our movie similarity script as-is might not work at all.
+	- The self-join is expensive, and Spark won\t distribute it on its own
+- Use `.repartition()` on a DataFrame , or `.partitionBy()` on an RDD before running a large operation that benefits from partitioning
+	- `Join()`, `cogroup()`, `groupWith()`, `join()`, `leftOuterJoin()`, `rightOuterJoin()`, `gorupByKey`, `reduceByKey()`, `combineByKey()`, and `lookUp()`
+	- Those operations will preserve your partitioning in their result too
+- Too few partitions won't take full advantage of your cluster
+- Too many partitions results in too much overhead from shuffling data
+- At least as many partitions as you have cores, or executors that fit within your available memory
+- `partitionBy(100)` is usually a reasonable place to start for large operations
+
+## Best practices for Running on a Cluster
+[Video 50](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5457856)
+- Avoid specifying Spark configuration in your driver script (including master) - this way, we'll use the defaults EMR sets up instead, as well as any command-line options you pass into `spark-submit`from your master node
+- If executors start failing, you may need to adjust the memory each executor has. For example: `spark-submit --executor-memory 1g {jarfile} {params}` 
+- Can use `--master yarn`  to run on a YARN cluster (but most of the time the default cluster values are good)
+- EMR sets this up by default
+- Get your scripts & data someplace where EMR can access them easily
+	- AWS's S3 is a good choice - just use s3n:// URL's when specifying file paths, and make sure your file permissions make them accessible
+- Spin up an EMR cluster for Spark using the AWS console
+- Get the external DNS name for the master node, and log into it using the `"hadoop"`user account and your private key file
+- Copy your driver program's JAR file and any files it needs
+- Run spark-submit and watch the output
+- (terminate the cluster when done)
+
+## Troubleshooting Cluster Jobs
+- Master will run a console on port `4040`
+	- But in EMR, it's next to impossible to actually connect to it from outside
+	- If you have your own cluster running on your own network, life's a little easier in that respect
+- Local Example: 
+	- Start `example/MovieSimilarities1MDatasetLocal`
+	- Go to : `http://127.0.0.1:4040/jobs/`
+- Logs
+	- in standalone mode, they're in the web UI
+	- In YARN though, the logs are distributed. You need to collect them after the fact using `yarn logs --aplicationID <app ID>`
+- While your driver runs the script, it will log error like executors failing to issue heartbeats
+	- This generally means you are asking too much of each executor
+	- You may need more of them
+	- Each executor may need more memory
+	- Or use `partitionBy()` to demand less work from individual executors by using smaller partitions
+- Managing Dependencies
+	- Remember your executors aren't necessarily on the same box as your driver script
+	- User broadcast variables to share data outside of `RDD`'s or `DataSets`
+	- Need some Java or Scala package that's not pre-loaded on EMR?
+		- Bundle them into your JAR with sbt assembly
+		- Or use `--jar` with `spark-submit`to ass individual libraries that are on the master
+		- Try to just avoid using obscure packages you don't need in the first place. 
+
+# Machine Learning with Spark ML
+## [MLLib](https://spark.apache.org/mllib/) 
+
+### [Capabilities](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365026)
+- Feature Extraction
+	- Term Frequency/ Inverse Document Frequency
+- Basic Statistics
+	- Chi-squared, Correlation (Spearman, Pearson), min, max, mean, variance
+- Linear and logistic regression
+- SVM
+- Naïve Bayes Classifier
+- Decision Trees
+- K-Means
+- PCA 
+- Recommendations using Alternating Least Squares
+
+Previous API was called `MLLib` and used `RDD`'s and some specialized data structures - this is deprecated and being discarded since `Spark 3.0`
+The newer `ML`library just uses dataframes for everything
+

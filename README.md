@@ -203,3 +203,12 @@ libraryDependencies ++= Seq(
 Previous API was called `MLLib` and used `RDD`'s and some specialized data structures - this is deprecated and being discarded since `Spark 3.0`
 The newer `ML`library just uses dataframes for everything
 
+
+## Spark ML examples
+
+| Video | Code | Notes |
+|--|--|--|
+| [Video 53](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365028) | [MovieRecommendation](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/MovieRecommendationDataset.scala) | Alternating Least Square algorithm. This is a simple example of how to use a ML algorithm, it performs really bad on this dataset though |
+| [Video 54](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365042) + [Video 55](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5582472) | [LinearRegressionDataFrame](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/LinearRegressionDataFrameDataset.scala) | Linear Regression. |
+| [Video 56](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22063906) | [RealEstateDecisionTree](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/RealEstateDecisionTree.scala) | [Decision trees](https://spark.apache.org/docs/latest/ml-classification-regression.html#decision-trees) |
+| [Video 57](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22063912) | [RealEstateDecisionTreeSunDog](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/RealEstateDecisionTreeCourse.scala) | Decision Trees, differences. No explicit schema, used `option("inferschema", "true")` instead. No Pipeline, no featuresIndexer. Far simpler implementation than mine. I think some code from my implementation are not used, because this implementation throws errors on the `case class` types (basically all Floats need to be Doubles), incl named type (transactionData -> transactionDate) |

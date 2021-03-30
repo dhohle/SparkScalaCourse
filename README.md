@@ -212,3 +212,69 @@ The newer `ML`library just uses dataframes for everything
 | [Video 54](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365042) + [Video 55](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5582472) | [LinearRegressionDataFrame](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/LinearRegressionDataFrameDataset.scala) | Linear Regression. |
 | [Video 56](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22063906) | [RealEstateDecisionTree](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/RealEstateDecisionTree.scala) | [Decision trees](https://spark.apache.org/docs/latest/ml-classification-regression.html#decision-trees) |
 | [Video 57](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22063912) | [RealEstateDecisionTreeSunDog](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/ml/RealEstateDecisionTreeCourse.scala) | Decision Trees, differences. No explicit schema, used `option("inferschema", "true")` instead. No Pipeline, no featuresIndexer. Far simpler implementation than mine. I think some code from my implementation are not used, because this implementation throws errors on the `case class` types (basically all Floats need to be Doubles), incl named type (transactionData -> transactionDate) |
+
+# Spark Streaming
+[Start Video 58](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5365054)
+- Analyses continual streams of data
+	- Common example: processing log data from a website or server
+- Data is aggregated and analyzed at some given interval
+- Can take data from some port, Amazon Kinesis, HDFS, Kafka, Flume and others
+- "Checkpointing" stores state to disk periodically for fault tolerance 
+- DStream
+	- A "Dstream" object breaks up the stream into distinct `RDD`'s
+	- Used a StreamingContext
+	- The RDD's only contain one little chunck of incoming data
+	- "Windowed operations" can combine results from multiple batches over some sliding time window
+		- see `window()`, `reduceByWindow()`, `reduceByKeyAndWindow()`
+	- `updateStateByKey()`
+		- Lets you maintain a state across many batches as time goes on
+		- For example, running counts of some event
+
+[Real-time Monitoring of the Most Popular Hashtags on Twitter](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22022796) with [Code](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/example/PopularHashtags.scala)
+
+## Structured Streaming
+[Video 60](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/5582486)
+- Spark 2 introduces "structured Streaming"
+- Uses DataSets as its primary API
+- Image a DataSet that just keeps getting appended to forever, and you query it whenever you want
+- Streaming is now real-time and not based on "micro-batches"
+Example:
+```scala
+val inputDF = spark.readStream.json("s3://logs)
+inputDF.groupBy($"action", window($"time", "1 hour")).count()
+	.writeStream.format("jdbc").start("jdbc:mysql://...")
+```
+### Streaming Example
+[Video 61](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22022812) with [Code](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/streaming/StructuredStreaming.scala)
+The streaming part is:
+```scala
+val accessLines = spark.readStream.text("data/logs")
+val logDF = accessLines.select(col("status"))
+val statusCountDF = logDF.groupBy("status").count()
+// Display the stream to the console  
+val query = statusCountDF  
+  .writeStream  
+  .outputMode("complete")  
+  .format("console")  
+  .queryName("counts")  
+  .start()
+```
+This will keeps checking the dir `data/logs` and when a new file appears, that file is processed
+
+### Sliding Windows example
+[Video 62](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22067484)
+[Video 63](https://www.udemy.com/course/apache-spark-with-scala-hands-on-with-big-data/learn/lecture/22067500)
+[Code](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/dataset/streaming/WindowedStreaming.scala)
+
+## GraphX and Pregel
+Works with RDD's, and is not being actively worked on... But here the [superhero example](https://github.com/dhohle/SparkScalaCourse/blob/master/src/main/scala/com/sundogsoftware/spark/self/rdd/graphx/GraphXPregel.scala) 
+
+# Finishing course:
+Book recommendations: 
+- [O'Reailly - Learning Spark](https://www.oreilly.com/library/view/learning-spark-2nd/9781492050032/) - July 2020
+- [Advanced Analytics with Spark](https://www.oreilly.com/library/view/advanced-analytics-with/9781491912751/) - April 2015 (seems too old)
+- [Spark Website](https://spark.apache.org/)
+	- [Spark SQL](https://spark.apache.org/sql/)
+	- [Spark Streaming](https://spark.apache.org/streaming/)
+	- [Spark MLlib](https://spark.apache.org/mllib/)
+	- [Spark GraphX](https://spark.apache.org/graphx/)

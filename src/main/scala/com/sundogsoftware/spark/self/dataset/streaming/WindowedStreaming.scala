@@ -42,9 +42,11 @@ object WindowedStreaming {
 
     val windowed = logDF
       .withColumn("eventTime", current_timestamp())
-      .groupBy(window(col("eventTime"), windowDuration = "3000 milliseconds", slideDuration = "1000 millisecond"), col("endpoint"))
-      .count().orderBy(col("count").desc)
-//      .limit(10)
+      .withWatermark("eventTime", "0 milliseconds")
+      .groupBy(window(col("eventTime"), windowDuration = "300 milliseconds", slideDuration = "100 milliseconds"), col("endpoint"))
+      .count()
+      .orderBy(col("count").desc)
+      .limit(10)
       .select("window.start", "window.end", "endpoint", "count")
 
 
